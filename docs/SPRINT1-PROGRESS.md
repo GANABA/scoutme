@@ -172,8 +172,8 @@
 - ✅ Workflow complet de test
 
 ### Tests Automatisés
-- ⏳ À implémenter: Tests unitaires (player.service.spec.ts)
-- ⏳ À implémenter: Tests d'intégration (player.routes.spec.ts)
+- ✅ Tests unitaires: player.service.test.ts (18 tests)
+- ✅ Tests d'intégration: player.routes.test.ts (20 tests)
 
 ---
 
@@ -277,8 +277,8 @@ REGISTER → pending → [ADMIN] → approved/rejected → (suspended)
 - ✅ Tests d'erreur (400, 401, 403, 404, 409)
 
 **Automatisés:**
-- ⏳ Tests unitaires (recruiter.service.spec.ts)
-- ⏳ Tests d'intégration (recruiter.routes.spec.ts)
+- ✅ Tests unitaires: recruiter.service.test.ts (10 tests)
+- ⏳ Tests d'intégration: recruiter.routes.test.ts (TODO)
 
 ---
 
@@ -366,8 +366,69 @@ REGISTER → pending → [ADMIN] → approved/rejected → (suspended)
 - ✅ Tests d'erreur (400, 401, 403, 404)
 
 **Automatisés:**
-- ⏳ Tests unitaires (admin.service.spec.ts)
-- ⏳ Tests d'intégration (admin.routes.spec.ts)
+- ✅ Tests unitaires: admin.service.test.ts (14 tests)
+- ⏳ Tests d'intégration: admin.routes.test.ts (TODO)
+
+---
+
+## 🧪 Tests Automatisés
+
+**Statut:** ✅ Infrastructure de tests implémentée
+
+### Configuration
+
+**Framework:** Jest + Supertest + ts-jest
+
+**Fichiers:**
+- ✅ `backend/jest.config.js` - Configuration Jest
+- ✅ `backend/.env.test` - Environnement de test
+- ✅ `backend/tests/setup.ts` - Setup global
+- ✅ `backend/tests/test-helpers.ts` - Helpers réutilisables
+- ✅ `backend/TESTING.md` - Documentation complète
+- ✅ `backend/TESTING-SETUP-SUMMARY.md` - Résumé configuration
+
+### Tests Implémentés
+
+**Services (Tests Unitaires):**
+- ✅ `auth.service.test.ts` - 14 tests (SPEC-MVP-001)
+- ✅ `player.service.test.ts` - 18 tests (SPEC-MVP-004, MVP-009)
+- ✅ `recruiter.service.test.ts` - 10 tests (SPEC-MVP-007)
+- ✅ `admin.service.test.ts` - 14 tests (SPEC-MVP-008)
+
+**Routes (Tests d'Intégration):**
+- ✅ `auth.routes.test.ts` - 15 tests
+- ✅ `player.routes.test.ts` - 20 tests
+
+**Total:** 91 tests
+**Coverage:** ~60% du backend
+**Tous les tests passent:** ✅
+
+### Scripts Disponibles
+
+```bash
+npm test                # Tous les tests
+npm run test:watch      # Mode watch
+npm run test:coverage   # Rapport coverage
+npm run test:services   # Services uniquement
+npm run test:routes     # Routes uniquement
+```
+
+### Tests Manquants (TODO)
+
+**Routes:**
+- ⏳ `recruiter.routes.test.ts` - Tests endpoints recruteur
+- ⏳ `admin.routes.test.ts` - Tests endpoints admin
+
+**Services:**
+- ⏳ `video.service.test.ts` - Tests gestion vidéos
+- ⏳ `photo.service.test.ts` - Tests upload photos
+
+### Prochaines Étapes Tests
+
+1. Compléter tests routes (recruiter, admin)
+2. Atteindre 80% coverage backend
+3. Intégrer tests dans CI/CD
+4. Tests E2E avec Playwright (Sprint 4)
 
 ---
 
@@ -417,9 +478,9 @@ REGISTER → pending → [ADMIN] → approved/rejected → (suspended)
 ## 📈 Métriques Projet
 
 ### Spécifications MVP
-- **Créées:** 8/22 (36%)
-- **Implémentées:** 7/22 (32%)
-- **Tests écrits:** 0/22 (0%)
+- **Créées:** 9/22 (41%)
+- **Implémentées:** 8/22 (36%)
+- **Tests écrits:** 5/22 (23%)
 
 ### Code Backend
 - **Fichiers créés:** 30+ (validators, utils, services, controllers, routes, middlewares, config)
@@ -462,10 +523,10 @@ REGISTER → pending → [ADMIN] → approved/rejected → (suspended)
    - Solution temporaire: Utiliser version existante
    - Fix: Redémarrer IDE ou regénérer manuellement
 
-2. **Tests:** Aucun test automatisé
-   - Impact: Pas de CI/CD coverage
-   - Priorité: Haute
-   - Action: Créer tests avant Sprint 2
+2. **Tests Routes:** Tests routes partiellement implémentés
+   - Impact: Routes admin et recruiter non testées
+   - Priorité: Moyenne
+   - Action: Compléter tests routes (recruiter, admin)
 
 ---
 
