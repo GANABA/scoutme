@@ -41,6 +41,7 @@ app.use(express.urlencoded({ extended: true }));
 // Import routes
 import authRoutes from "./routes/auth.routes";
 import playerRoutes from "./routes/player.routes";
+import recruiterRoutes from "./routes/recruiter.routes";
 
 // Route de santé (health check)
 app.get("/health", (req: Request, res: Response) => {
@@ -63,9 +64,9 @@ app.get("/", (req: Request, res: Response) => {
 // Routes API
 app.use("/api/auth", authRoutes);
 app.use("/api/players", playerRoutes);
+app.use("/api/recruiters", recruiterRoutes);
 
 // TODO: Ajouter les autres routes
-// app.use("/api/recruiters", recruitersRoutes);
 // app.use("/api/admin", adminRoutes);
 
 // ============================================
