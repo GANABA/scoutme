@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import * as playerController from '../controllers/player.controller';
 import * as videoController from '../controllers/video.controller';
-import { requireAuth, requirePlayer } from '../middlewares/auth.middleware';
+import { requireAuth, requirePlayer, requireApprovedRecruiter } from '../middlewares/auth.middleware';
 import { validateRequest } from '../middlewares/validateRequest';
-import { createPlayerSchema, updatePlayerSchema } from '../validators/player.validator';
+import { createPlayerSchema, updatePlayerSchema, searchPlayersSchema } from '../validators/player.validator';
 import { addVideoSchema, updateVideoTitleSchema } from '../validators/video.validator';
 import { uploadPhoto } from '../middlewares/upload.middleware';
 
@@ -38,6 +38,21 @@ router.get(
   requireAuth,
   requirePlayer,
   playerController.getMyProfile
+);
+
+/**
+ * GET /api/players/search
+ * Rechercher des joueurs selon critères
+ * Authentification requise + recruiter approuvé
+ * SPEC-MVP-009
+ * IMPORTANT: Cette route doit être AVANT /api/players/:id pour éviter confusion
+ */
+router.get(
+  '/search',
+  requireAuth,
+  requireApprovedRecruiter,
+  validateRequest(searchPlayersSchema),
+  playerController.searchPlayers
 );
 
 /**

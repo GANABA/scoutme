@@ -329,3 +329,33 @@ export async function deletePlayerPhoto(req: Request, res: Response) {
     });
   }
 }
+
+/**
+ * GET /api/players/search
+ * Rechercher des joueurs selon critères
+ * SPEC-MVP-009
+ */
+export async function searchPlayers(req: Request, res: Response) {
+  try {
+    const filters = req.query as any;
+
+    const result = await playerService.searchPlayers(filters);
+
+    // Formater les joueurs avec âge calculé
+    const formattedPlayers = result.players.map(player =>
+      formatPlayerResponse(player, false) // Public view, pas de champs sensibles
+    );
+
+    return res.status(200).json({
+      players: formattedPlayers,
+      pagination: result.pagination,
+      filters: result.filters
+    });
+  } catch (error: any) {
+    console.error('Erreur recherche joueurs:', error);
+    return res.status(500).json({
+      error: 'Erreur lors de la recherche de joueurs',
+      code: 'PLAYER_SEARCH_ERROR'
+    });
+  }
+}

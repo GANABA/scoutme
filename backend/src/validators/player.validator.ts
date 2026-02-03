@@ -113,3 +113,61 @@ export const updatePlayerSchema = createPlayerSchema.partial();
 
 export type CreatePlayerInput = z.infer<typeof createPlayerSchema>;
 export type UpdatePlayerInput = z.infer<typeof updatePlayerSchema>;
+
+/**
+ * Schéma Zod: Recherche joueurs
+ * SPEC-MVP-009
+ */
+export const searchPlayersSchema = z.object({
+  position: z.enum(VALID_POSITIONS as [string, ...string[]], {
+    errorMap: () => ({ message: 'Position invalide' })
+  }).optional(),
+
+  ageMin: z.coerce.number()
+    .int('L\'âge minimum doit être un entier')
+    .min(13, 'L\'âge minimum doit être au moins 13 ans')
+    .max(45, 'L\'âge minimum ne peut pas dépasser 45 ans')
+    .optional(),
+
+  ageMax: z.coerce.number()
+    .int('L\'âge maximum doit être un entier')
+    .min(13, 'L\'âge maximum doit être au moins 13 ans')
+    .max(45, 'L\'âge maximum ne peut pas dépasser 45 ans')
+    .optional(),
+
+  country: z.string()
+    .min(2, 'Le pays doit contenir au moins 2 caractères')
+    .max(100, 'Le pays ne peut pas dépasser 100 caractères')
+    .trim()
+    .optional(),
+
+  page: z.coerce.number()
+    .int('La page doit être un entier')
+    .min(1, 'La page doit être au moins 1')
+    .optional()
+    .default(1),
+
+  limit: z.coerce.number()
+    .int('La limite doit être un entier')
+    .min(1, 'La limite doit être au moins 1')
+    .max(100, 'La limite ne peut pas dépasser 100')
+    .optional()
+    .default(20),
+
+  sortBy: z.enum(['createdAt', 'age']).optional().default('createdAt'),
+
+  sortOrder: z.enum(['asc', 'desc']).optional().default('desc')
+}).refine(
+  (data) => {
+    if (data.ageMin && data.ageMax) {
+      return data.ageMin <= data.ageMax;
+    }
+    return true;
+  },
+  {
+    message: 'L\'âge minimum doit être inférieur ou égal à l\'âge maximum',
+    path: ['ageMin']
+  }
+);
+
+export type SearchPlayersInput = z.infer<typeof searchPlayersSchema>;
