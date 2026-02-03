@@ -1,5 +1,5 @@
 import { prisma } from '../config/database';
-import { CreatePlayerInput, UpdatePlayerInput } from '../validators/player.validator';
+import { CreatePlayerInput, UpdatePlayerInput, SearchPlayersInput } from '../validators/player.validator';
 import { Prisma } from '@prisma/client';
 
 /**
@@ -154,4 +154,91 @@ export async function permanentlyDeletePlayerProfile(playerId: string) {
   });
 
   return { success: true };
+}
+
+/**
+ * Rechercher des joueurs selon critères
+ * SPEC-MVP-009
+ */
+export async function searchPlayers(filters: SearchPlayersInput) {
+  const { position, ageMin, ageMax, country, page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'desc' } = filters;
+
+  // Construire la requête Prisma WHERE
+  const where: Prisma.PlayerWhereInput = {
+    status: 'active', // Seulement joueurs actifs
+  };
+
+  // Filtre position (primaryPosition OU dans secondaryPositions)
+  if (position) {
+    where.OR = [
+      { primaryPosition: position },
+      { secondaryPositions: { has: position } }
+    ];
+  }
+
+  // Filtre pays (case-insensitive)
+  if (country) {
+    where.country = {
+      equals: country,
+      mode: 'insensitive'
+    };
+  }
+
+  // Filtre âge (calculé via birthDate)
+  if (ageMin || ageMax) {
+    const today = new Date();
+
+    // Pour ageMin: on veut les joueurs plus jeunes que ageMin
+    // Donc birthDate doit être après (today - ageMin years)
+    const maxBirthDate = ageMin
+      ? new Date(today.getFullYear() - ageMin, today.getMonth(), today.getDate())
+      : undefined;
+
+    // Pour ageMax: on veut les joueurs plus âgés que ageMax
+    // Donc birthDate doit être avant (today - ageMax - 1 years)
+    const minBirthDate = ageMax
+      ? new Date(today.getFullYear() - ageMax - 1, today.getMonth(), today.getDate())
+      : undefined;
+
+    where.birthDate = {
+      ...(minBirthDate && { gte: minBirthDate }),
+      ...(maxBirthDate && { lte: maxBirthDate })
+    };
+  }
+
+  // Pagination
+  const skip = (page - 1) * limit;
+
+  // Tri
+  // Note: Pour trier par âge, on trie par birthDate inversé (plus récent = plus jeune)
+  const orderBy: Prisma.PlayerOrderByWithRelationInput = sortBy === 'age'
+    ? { birthDate: sortOrder === 'asc' ? 'desc' : 'asc' as Prisma.SortOrder } // Inversé
+    : { createdAt: sortOrder as Prisma.SortOrder };
+
+  // Exécuter requête avec Promise.all pour performance
+  const [players, total] = await Promise.all([
+    prisma.player.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limit
+    }),
+    prisma.player.count({ where })
+  ]);
+
+  return {
+    players,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    },
+    filters: {
+      ...(position && { position }),
+      ...(ageMin && { ageMin }),
+      ...(ageMax && { ageMax }),
+      ...(country && { country })
+    }
+  };
 }
