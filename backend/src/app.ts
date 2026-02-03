@@ -38,6 +38,10 @@ app.use(express.urlencoded({ extended: true }));
 // ROUTES
 // ============================================
 
+// Import routes
+import authRoutes from "./routes/auth.routes";
+import playerRoutes from "./routes/player.routes";
+
 // Route de santé (health check)
 app.get("/health", (req: Request, res: Response) => {
   res.status(200).json({
@@ -56,9 +60,11 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
-// TODO: Ajouter les routes API
-// app.use("/api/auth", authRoutes);
-// app.use("/api/players", playersRoutes);
+// Routes API
+app.use("/api/auth", authRoutes);
+app.use("/api/players", playerRoutes);
+
+// TODO: Ajouter les autres routes
 // app.use("/api/recruiters", recruitersRoutes);
 // app.use("/api/admin", adminRoutes);
 

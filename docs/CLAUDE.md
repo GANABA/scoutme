@@ -199,6 +199,82 @@ refactor(database): optimize player search query
 - **main** and **staging** require pull request reviews
 - CI must pass before merge
 
+### Feature Branch Strategy
+**MANDATORY:** Use feature branches for all non-trivial work
+
+**Branch Naming Convention:**
+```
+feature/SPEC-MVP-XXX-short-description    # For spec implementation
+feature/sprint-X-description              # For sprint work
+bugfix/issue-description                  # For bug fixes
+hotfix/critical-fix                       # For production hotfixes
+```
+
+**Examples:**
+```
+feature/SPEC-MVP-007-recruiter-profile
+feature/sprint-2-player-search
+bugfix/video-upload-validation
+```
+
+**Workflow:**
+1. Create feature branch from `develop` (or `main` if no develop branch yet)
+2. Implement feature with regular commits
+3. When complete, merge back to `develop` (or `main`)
+4. Delete feature branch after merge
+
+**Benefits:**
+- Professional version control
+- Clear feature isolation
+- Easy rollback if needed
+- Better collaboration
+- Clean commit history
+
+### Automatic Commit and Push Policy
+**CRITICAL RULE:** After completing a spec implementation, ALWAYS commit and push
+
+**Trigger conditions:**
+- A spec is fully implemented
+- Manual testing is completed and passed
+- Documentation is updated (if applicable)
+
+**Workflow:**
+1. Verify all changes are working
+2. Stage relevant files (avoid test scripts unless needed)
+3. Create commit with proper conventional commit message
+4. Push to remote repository
+5. THEN proceed to next spec/task
+
+**Commit Message Format for Spec Completion:**
+```
+feat(SPEC-ID): implement [spec title]
+
+- List major changes
+- Include key features
+- Mention any breaking changes
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+**Example:**
+```
+feat(SPEC-MVP-006): implement YouTube video management
+
+- Add video CRUD endpoints (POST, GET, PUT, DELETE)
+- Support 4 YouTube URL formats
+- Auto-generate thumbnails
+- Limit 3 videos per player
+- Validate video IDs and detect duplicates
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+**Important:**
+- Do NOT proceed to next spec without committing current work
+- Create feature branch for each spec or sprint
+- Keep commits atomic and well-described
+- Push regularly to avoid losing work
+
 ---
 
 ## Commands (Once Code Exists)
@@ -240,6 +316,56 @@ npx prisma db pull
 
 # Validate schema
 npx prisma validate
+```
+
+---
+
+## Code Style Guidelines
+
+### Emoji Usage Policy
+**MANDATORY:** Minimize emoji usage in code and technical documentation
+
+**Rules:**
+- **NEVER** use emojis in:
+  - Source code (controllers, services, validators, utils)
+  - API responses
+  - Error messages
+  - Log statements
+  - Database content
+  - Variable/function names
+  - Code comments (use clear text instead)
+
+- **ACCEPTABLE** use in:
+  - User-facing documentation (README.md)
+  - Commit messages (sparingly, e.g., one at start)
+  - Progress tracking documents (like SPRINT1-PROGRESS.md)
+  - Markdown checklists (e.g., ✅ ⏳ ❌)
+
+**Rationale:**
+- Professional codebase standards
+- Better text editor compatibility
+- Easier code search and grep
+- Accessibility considerations
+- International team readability
+
+**Examples:**
+
+**BAD:**
+```typescript
+// ❌ Don't do this
+export const createPlayer = async () => {
+  console.log('Creating player profile...');
+  throw new Error('Invalid data provided');
+};
+```
+
+**GOOD:**
+```typescript
+// Correct approach
+export const createPlayer = async () => {
+  console.log('Creating player profile...');
+  throw new Error('Invalid data provided');
+};
 ```
 
 ---
@@ -579,5 +705,5 @@ The system MUST hash passwords using bcrypt with minimum 10 rounds.
 
 ---
 
-**Last Updated:** 2026-02-02
+**Last Updated:** 2026-02-03
 **Maintainer:** ScoutMe Team

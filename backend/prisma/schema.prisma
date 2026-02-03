@@ -25,6 +25,20 @@ model User {
   email        String   @unique @db.VarChar(255)
   passwordHash String   @map("password_hash") @db.VarChar(255)
   userType     UserType @map("user_type")
+
+  // Email verification (SPEC-MVP-002)
+  emailVerified             Boolean   @default(false) @map("email_verified")
+  verificationToken         String?   @unique @map("verification_token") @db.VarChar(255)
+  verificationTokenExpires  DateTime? @map("verification_token_expires")
+  verificationEmailCount    Int       @default(0) @map("verification_email_count")
+  lastVerificationEmailSent DateTime? @map("last_verification_email_sent")
+
+  // Password reset (SPEC-MVP-003)
+  resetToken         String?   @unique @map("reset_token") @db.VarChar(255)
+  resetTokenExpires  DateTime? @map("reset_token_expires")
+  resetRequestCount  Int       @default(0) @map("reset_request_count")
+  lastResetRequest   DateTime? @map("last_reset_request")
+
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
@@ -32,6 +46,8 @@ model User {
   player    Player?
   recruiter Recruiter?
 
+  @@index([verificationToken])
+  @@index([resetToken])
   @@map("users")
 }
 
