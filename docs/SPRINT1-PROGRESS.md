@@ -282,15 +282,103 @@ REGISTER → pending → [ADMIN] → approved/rejected → (suspended)
 
 ---
 
+### SPEC-MVP-008: Dashboard Admin Validation Recruteurs
+
+**Statut:** ✅ Spécification créée + Implémentation complète
+
+#### Documents Créés
+- ✅ `docs/specs/MVP/SPEC-MVP-008-admin-dashboard.md` - Spécification complète
+- ✅ `backend/TEST-ADMIN-API.md` - Guide de test manuel
+- ✅ `docs/SPEC-MVP-008-SUMMARY.md` - Résumé d'implémentation
+
+#### Code Backend Implémenté
+
+**Validators:**
+- ✅ `backend/src/validators/admin.validator.ts` (NOUVEAU)
+  - Schémas Zod pour changement statut recruteur/joueur
+  - Validation statuts valides
+  - Raison optionnelle (min 10, max 500 chars)
+
+**Services:**
+- ✅ `backend/src/services/admin.service.ts` (NOUVEAU)
+  - `getPendingRecruiters()` - Liste recruteurs pending
+  - `getAllRecruiters()` - Tous recruteurs avec filtres
+  - `changeRecruiterStatus()` - Approve/reject/suspend
+  - `getAllPlayers()` - Tous joueurs avec filtres
+  - `changePlayerStatus()` - Suspend/unsuspend
+  - `getPlatformStats()` - Statistiques complètes
+
+**Controllers:**
+- ✅ `backend/src/controllers/admin.controller.ts` (NOUVEAU)
+  - GET /api/admin/recruiters/pending
+  - GET /api/admin/recruiters
+  - PUT /api/admin/recruiters/:id/status
+  - GET /api/admin/players
+  - PUT /api/admin/players/:id/status
+  - GET /api/admin/stats
+
+**Routes:**
+- ✅ `backend/src/routes/admin.routes.ts` (NOUVEAU)
+  - 6 routes configurées
+  - Toutes protégées par requireAuth + requireAdmin
+  - Validation Zod intégrée
+  - Pagination support
+
+**Intégration:**
+- ✅ Routes enregistrées dans `app.ts`
+- ✅ Import adminRoutes ajouté
+
+#### Fonctionnalités
+
+**Validation Recruteurs:**
+- Voir liste pending avec pagination
+- Approuver (status → approved, approvedBy + approvedAt renseignés)
+- Rejeter (status → rejected, raison optionnelle)
+- Suspendre (status → suspended)
+
+**Modération Joueurs:**
+- Voir tous joueurs avec filtres
+- Suspendre joueur (status → suspended)
+- Réactiver joueur (status → active)
+
+**Statistiques:**
+- Users totaux (par type)
+- Recruiters (par statut)
+- Players (par statut)
+- Stats récentes (nouveaux users, pending)
+
+**Pagination:**
+- Query params: page, limit
+- Limite max: 100 résultats/page
+- Format réponse standardisé
+
+**Logs Admin:**
+- Toutes actions loggées côté serveur
+- Format: [ADMIN] adminId action details
+
+#### Tests
+
+**Manuels:**
+- ✅ Guide TEST-ADMIN-API.md
+- ✅ Workflow complet validation recruteur
+- ✅ Tests modération joueurs
+- ✅ Tests statistiques
+- ✅ Tests d'erreur (400, 401, 403, 404)
+
+**Automatisés:**
+- ⏳ Tests unitaires (admin.service.spec.ts)
+- ⏳ Tests d'intégration (admin.routes.spec.ts)
+
+---
+
 ## 🚀 Prochaines Étapes
 
-### Immédiat - Sprint 1 (À compléter)
-1. **SPEC-MVP-008:** Dashboard Admin Validation Recruteurs
-   - Liste recruteurs pending
-   - Bouton Approuver/Rejeter
-   - Changement status recruteur
-   - Modération joueurs
-   - Stats plateforme
+### Sprint 2 (Semaines 3-4)
+1. **SPEC-MVP-009:** API Recherche Joueurs
+   - Filtres (position, âge, pays)
+   - Middleware requireApprovedRecruiter
+   - Pagination résultats
+   - Tri des résultats
 
 ### Tests
 2. Écrire tests unitaires (player.service.ts, recruiter.service.ts)
@@ -319,26 +407,29 @@ REGISTER → pending → [ADMIN] → approved/rejected → (suspended)
 | Upload Photo | ✅ | 100% |
 | Vidéos YouTube | ✅ | 100% |
 | Profil Recruteur | ✅ | 100% |
-| Admin Dashboard | ⏳ | 0% |
+| Admin Dashboard | ✅ | 100% |
 
-**Progression Globale Sprint 1:** 87.5% (7/8 tâches complètes, 1 à 50%)
+**Progression Globale Sprint 1:** 100% (8/8 tâches complètes)
+**Statut:** SPRINT 1 MVP COMPLÉTÉ
 
 ---
 
 ## 📈 Métriques Projet
 
 ### Spécifications MVP
-- **Créées:** 7/22 (32%)
-- **Implémentées:** 6/22 (27%)
+- **Créées:** 8/22 (36%)
+- **Implémentées:** 7/22 (32%)
 - **Tests écrits:** 0/22 (0%)
 
 ### Code Backend
-- **Fichiers créés:** 25+ (validators, utils, services, controllers, routes, middlewares, config)
+- **Fichiers créés:** 30+ (validators, utils, services, controllers, routes, middlewares, config)
 - **Endpoints API Joueurs:** 10 (profil + vidéos + photo)
 - **Endpoints API Recruteurs:** 5 (profil CRUD)
+- **Endpoints API Admin:** 6 (validation + modération + stats)
 - **Endpoints API Auth:** 3+ (register, login, refresh)
+- **Total Endpoints:** 24+
 - **Migrations:** 2 (init + auth_fields)
-- **Lignes de code:** ~4000+ lignes
+- **Lignes de code:** ~5000+ lignes
 
 ---
 
@@ -392,5 +483,5 @@ REGISTER → pending → [ADMIN] → approved/rejected → (suspended)
 ---
 
 **Dernière mise à jour:** 2026-02-03
-**Statut:** Sprint 1 presque terminé (87.5%)
-**Prochaine tâche:** SPEC-MVP-008 (Dashboard Admin Validation Recruteurs)
+**Statut:** Sprint 1 MVP COMPLÉTÉ À 100%
+**Prochaine tâche:** SPEC-MVP-009 (API Recherche Joueurs) - Sprint 2
