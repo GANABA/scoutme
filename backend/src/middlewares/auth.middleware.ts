@@ -126,3 +126,49 @@ export function requireOwnership(req: Request, res: Response, next: NextFunction
 
   next();
 }
+
+/**
+ * Middleware: Vérifier que le recruteur est approuvé
+ * SPEC-MVP-007: Restreindre l'accès aux fonctionnalités selon le statut
+ */
+export async function requireApprovedRecruiter(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user || req.user.userType !== 'recruiter') {
+      return res.status(403).json({
+        error: 'Accès réservé aux recruteurs',
+        code: 'AUTH_FORBIDDEN_RECRUITER_ONLY'
+      });
+    }
+
+    // Importer prisma dynamiquement pour éviter les dépendances circulaires
+    const { prisma } = await import('../config/database');
+
+    // Vérifier le statut du recruteur
+    const recruiter = await prisma.recruiter.findUnique({
+      where: { userId: req.user.userId }
+    });
+
+    if (!recruiter) {
+      return res.status(404).json({
+        error: 'Profil recruteur introuvable',
+        code: 'RECRUITER_PROFILE_NOT_FOUND'
+      });
+    }
+
+    if (recruiter.status !== 'approved') {
+      return res.status(403).json({
+        error: 'Votre compte recruteur est en attente de validation',
+        code: 'RECRUITER_NOT_APPROVED',
+        status: recruiter.status
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error('Erreur middleware requireApprovedRecruiter:', error);
+    return res.status(500).json({
+      error: 'Erreur lors de la vérification du statut recruteur',
+      code: 'AUTH_CHECK_ERROR'
+    });
+  }
+}

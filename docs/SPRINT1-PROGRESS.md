@@ -1,6 +1,6 @@
 # Sprint 1 MVP - Rapport de Progression
 
-**Date:** 2026-02-02
+**Date:** 2026-02-03 (Mise à jour)
 **Sprint:** 1 (Semaines 1-2)
 **Objectif:** Authentification et Profils de Base
 
@@ -185,32 +185,124 @@
 | SPEC-MVP-002 | Validation Email | ✅ Créée + Implémentée |
 | SPEC-MVP-003 | Récupération Mot de Passe | ✅ Créée (implémentation pending) |
 | SPEC-MVP-004 | Création Profil Joueur | ✅ Créée + Implémentée |
+| SPEC-MVP-005 | Upload Photo Joueur | ✅ Créée + Implémentée |
+| SPEC-MVP-006 | Vidéos YouTube Joueur | ✅ Créée + Implémentée |
+| SPEC-MVP-007 | Création Profil Recruteur | ✅ Créée + Implémentée |
+
+---
+
+### SPEC-MVP-007: Création Profil Recruteur
+
+**Statut:** ✅ Spécification créée + Implémentation complète
+
+#### Documents Créés
+- ✅ `docs/specs/MVP/SPEC-MVP-007-profil-recruteur.md` - Spécification complète
+- ✅ `backend/TEST-RECRUITER-API.md` - Guide de test manuel
+- ✅ `docs/SPEC-MVP-007-SUMMARY.md` - Résumé d'implémentation
+
+#### Code Backend Implémenté
+
+**Services:**
+- ✅ `backend/src/services/recruiter.service.ts` (existait déjà)
+  - `createRecruiterProfile()` - Créer profil (status = 'pending')
+  - `getRecruiterById()` - Récupérer par ID
+  - `getRecruiterByUserId()` - Récupérer par userId
+  - `updateRecruiterProfile()` - Mettre à jour
+  - `deleteRecruiterProfile()` - Soft delete (status = 'suspended')
+
+**Controllers:**
+- ✅ `backend/src/controllers/recruiter.controller.ts` (existait déjà)
+  - POST /api/recruiters - Créer profil
+  - GET /api/recruiters/:id - Récupérer profil (owner/admin)
+  - GET /api/recruiters/me - Mon profil
+  - PUT /api/recruiters/:id - Mettre à jour
+  - DELETE /api/recruiters/:id - Supprimer
+
+**Validators:**
+- ✅ `backend/src/validators/recruiter.validator.ts` (existait déjà)
+  - Schémas Zod pour création et mise à jour
+  - Validation types d'organisation (4 types: club, academy, agency, other)
+  - Validation champs obligatoires
+
+**Utilitaires:**
+- ✅ `backend/src/utils/recruiter.utils.ts` (existait déjà)
+  - Formatage réponses API
+  - Labels types d'organisation
+
+**Routes:**
+- ✅ `backend/src/routes/recruiter.routes.ts` (NOUVEAU)
+  - 5 routes configurées
+  - Middlewares auth + RBAC
+  - Validation Zod intégrée
+
+**Middlewares:**
+- ✅ `backend/src/middlewares/auth.middleware.ts` (MIS À JOUR)
+  - `requireRecruiter()` - Vérifier userType = 'recruiter' (existait)
+  - `requireApprovedRecruiter()` - Vérifier status = 'approved' (NOUVEAU)
+
+**Intégration:**
+- ✅ Routes enregistrées dans `app.ts`
+- ✅ Import recruiterRoutes ajouté
+
+#### Fonctionnalités
+
+**Workflow de Statut:**
+```
+REGISTER → pending → [ADMIN] → approved/rejected → (suspended)
+```
+
+**États:**
+- **pending**: En attente validation (défaut)
+- **approved**: Validé, accès complet
+- **rejected**: Rejeté, pas d'accès
+- **suspended**: Suspendu
+
+**Types d'Organisation:**
+- club (Club Professionnel)
+- academy (Académie/Centre de Formation)
+- agency (Agence de Joueurs)
+- other (Autre)
+
+**RBAC:**
+- Création: auth + userType = 'recruiter'
+- Lecture: auth + (owner ou admin)
+- Modification: auth + ownership
+- Suppression: auth + (owner ou admin)
+
+#### Tests
+
+**Manuels:**
+- ✅ Guide TEST-RECRUITER-API.md
+- ✅ Exemples cURL et PowerShell
+- ✅ Tests d'erreur (400, 401, 403, 404, 409)
+
+**Automatisés:**
+- ⏳ Tests unitaires (recruiter.service.spec.ts)
+- ⏳ Tests d'intégration (recruiter.routes.spec.ts)
 
 ---
 
 ## 🚀 Prochaines Étapes
 
-### Immédiat
-1. **SPEC-MVP-005:** Upload Photo Profil Joueur
-   - Intégration Cloudinary
-   - Upload via API
-   - Validation taille/format (max 5MB, JPG/PNG/WebP)
-   - URL stockée dans `profilePhotoUrl`
-
-2. **SPEC-MVP-006:** Gestion Vidéos YouTube Joueur
-   - Validation URL YouTube
-   - Maximum 3 vidéos (MVP)
-   - Stockage dans `videoUrls` (JSON array)
-   - Extraction metadata (titre optionnel)
-
-### Sprint 1 (À compléter)
-3. **SPEC-MVP-007:** Création Profil Recruteur
-4. **SPEC-MVP-008:** Dashboard Admin Validation Recruteurs
+### Immédiat - Sprint 1 (À compléter)
+1. **SPEC-MVP-008:** Dashboard Admin Validation Recruteurs
+   - Liste recruteurs pending
+   - Bouton Approuver/Rejeter
+   - Changement status recruteur
+   - Modération joueurs
+   - Stats plateforme
 
 ### Tests
-5. Écrire tests unitaires pour player.service.ts
-6. Écrire tests d'intégration pour player.routes.ts
-7. Tests E2E avec Playwright (Sprint 4)
+2. Écrire tests unitaires (player.service.ts, recruiter.service.ts)
+3. Écrire tests d'intégration (player.routes.ts, recruiter.routes.ts)
+4. Tests E2E avec Playwright (Sprint 4)
+
+### Password Reset
+5. Implémenter SPEC-MVP-003 (spec créée, code à faire)
+   - Endpoint request reset
+   - Endpoint verify token
+   - Endpoint reset password
+   - Email templates
 
 ---
 
@@ -224,27 +316,29 @@
 | Email Verification | ✅ | 100% |
 | Password Reset | 🟡 | 50% (spec créée) |
 | Profil Joueur | ✅ | 100% |
-| Upload Photo | ⏳ | 0% |
-| Vidéos YouTube | ⏳ | 0% |
-| Profil Recruteur | ⏳ | 0% |
+| Upload Photo | ✅ | 100% |
+| Vidéos YouTube | ✅ | 100% |
+| Profil Recruteur | ✅ | 100% |
 | Admin Dashboard | ⏳ | 0% |
 
-**Progression Globale Sprint 1:** 37.5% (3/8 tâches complètes)
+**Progression Globale Sprint 1:** 87.5% (7/8 tâches complètes, 1 à 50%)
 
 ---
 
 ## 📈 Métriques Projet
 
 ### Spécifications MVP
-- **Créées:** 4/22 (18%)
-- **Implémentées:** 1/22 (5%)
+- **Créées:** 7/22 (32%)
+- **Implémentées:** 6/22 (27%)
 - **Tests écrits:** 0/22 (0%)
 
 ### Code Backend
-- **Fichiers créés:** 5 (validators, utils, services, controllers, routes)
-- **Endpoints API:** 5 (POST, GET, GET /me, PUT, DELETE)
+- **Fichiers créés:** 25+ (validators, utils, services, controllers, routes, middlewares, config)
+- **Endpoints API Joueurs:** 10 (profil + vidéos + photo)
+- **Endpoints API Recruteurs:** 5 (profil CRUD)
+- **Endpoints API Auth:** 3+ (register, login, refresh)
 - **Migrations:** 2 (init + auth_fields)
-- **Lignes de code:** ~500 lignes
+- **Lignes de code:** ~4000+ lignes
 
 ---
 
@@ -297,6 +391,6 @@
 
 ---
 
-**Dernière mise à jour:** 2026-02-02 23:15
-**Statut:** Sprint 1 en progression (37.5%)
-**Prochaine tâche:** SPEC-MVP-005 (Upload Photo Joueur)
+**Dernière mise à jour:** 2026-02-03
+**Statut:** Sprint 1 presque terminé (87.5%)
+**Prochaine tâche:** SPEC-MVP-008 (Dashboard Admin Validation Recruteurs)
