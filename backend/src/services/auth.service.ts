@@ -1,4 +1,4 @@
-import { PrismaClient, User, UserType } from '@prisma/client';
+import { User, UserType } from '@prisma/client';
 import { hashPassword, comparePassword } from '../utils/password.utils';
 import {
   generateAccessToken,
@@ -15,8 +15,7 @@ import {
   sendVerificationEmail,
   sendPasswordResetEmail
 } from './email.service';
-
-const prisma = new PrismaClient();
+import prisma from '../config/database';
 
 // Types
 interface RegisterInput {
@@ -76,7 +75,7 @@ export async function register(data: RegisterInput): Promise<Omit<User, 'passwor
   });
 
   // Envoyer email de vérification (async, ne pas bloquer)
-  sendVerificationEmail(user.email, verificationToken).catch((error) => {
+  void sendVerificationEmail(user.email, verificationToken)?.catch((error) => {
     console.error('Erreur envoi email de vérification:', error);
     // Ne pas faire échouer l'inscription si l'email échoue
   });
@@ -344,14 +343,19 @@ export async function resetPassword(token: string, newPassword: string): Promise
  * @returns Utilisateur (sans le mot de passe)
  */
 export async function getUserById(userId: string): Promise<Omit<User, 'passwordHash'> | null> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId }
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
 
-  if (!user) {
+    if (!user) {
+      return null;
+    }
+
+    const { passwordHash: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  } catch (error) {
+    // Handle invalid UUID format
     return null;
   }
-
-  const { passwordHash: _, ...userWithoutPassword } = user;
-  return userWithoutPassword;
 }

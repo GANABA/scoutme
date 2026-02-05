@@ -1,4 +1,12 @@
-import { prisma } from '../src/config/database';
+import prisma from '../src/config/database';
+
+// Mock email service to prevent actual emails from being sent during tests
+jest.mock('../src/services/email.service', () => ({
+  sendVerificationEmail: jest.fn().mockResolvedValue(undefined),
+  sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
+  sendRecruiterApprovalEmail: jest.fn().mockResolvedValue(undefined),
+  sendRecruiterRejectionEmail: jest.fn().mockResolvedValue(undefined),
+}));
 
 // Configuration globale des tests
 beforeAll(async () => {
@@ -15,10 +23,9 @@ afterAll(async () => {
 afterEach(async () => {
   // Supprimer toutes les données dans l'ordre des dépendances
   const tables = [
-    'Video',
-    'Player',
-    'Recruiter',
-    'User'
+    'players',
+    'recruiters',
+    'users'
   ];
 
   for (const table of tables) {

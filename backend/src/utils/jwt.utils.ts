@@ -22,10 +22,10 @@ interface DecodedToken {
 }
 
 // Secrets (depuis variables d'environnement)
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
 
-if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
+if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
   throw new Error('JWT_SECRET and JWT_REFRESH_SECRET must be defined in environment variables');
 }
 

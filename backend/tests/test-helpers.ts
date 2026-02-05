@@ -1,4 +1,4 @@
-import { prisma } from '../src/config/database';
+import prisma from '../src/config/database';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -6,16 +6,24 @@ import jwt from 'jsonwebtoken';
  * Helpers pour créer des données de test
  */
 
+export function generateUniqueEmail(prefix: string = 'test'): string {
+  return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 10000)}@example.com`;
+}
+
 export async function createTestUser(userType: 'player' | 'recruiter' | 'admin', overrides?: any) {
   const password = overrides?.password || 'Test1234!';
   const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Remove password from overrides to avoid passing it to Prisma
+  const { password: _, ...prismaOverrides } = overrides || {};
 
   return prisma.user.create({
     data: {
       email: overrides?.email || `test-${Date.now()}@example.com`,
       passwordHash: hashedPassword,
       userType,
-      ...overrides,
+      emailVerified: true, // Verify email by default for tests
+      ...prismaOverrides,
     },
   });
 }
@@ -88,7 +96,7 @@ export async function createAuthenticatedAdmin() {
 }
 
 export async function cleanDatabase() {
-  const tables = ['Video', 'Player', 'Recruiter', 'User'];
+  const tables = ['players', 'recruiters', 'users'];
   for (const table of tables) {
     await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${table}" CASCADE;`);
   }
